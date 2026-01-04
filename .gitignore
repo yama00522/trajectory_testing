@@ -34,9 +34,12 @@ wheels/
 .DS_Store
 Thumbs.db
 
-# Project specific
-output_csv/
-merged_csv/
-merged_outdate/
+# Project specific - ignore contents but keep directories
+output_csv/*
+!output_csv/.gitkeep
+merged_csv/*
+!merged_csv/.gitkeep
+merged_outdate/*
+!merged_outdate/.gitkeep
 *.csv
 *.tmp.csv
