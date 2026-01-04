@@ -9,7 +9,6 @@ def main():
     merger = CsvMerger(
         input_dir="./output_csv",
         output_dir="./merged_csv",
-        outdate_dir="./merged_outdate",
         num_files=20,
     )
 

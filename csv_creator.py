@@ -20,16 +20,35 @@ class CsvCreator:
         if sleep_time > 0:
             time.sleep(sleep_time)
 
+    # def _create_csv(self) -> None:
+    #     timestamp: str = self.next_tick.strftime("%Y%m%d_%H%M%S")
+    #     filepath: Path = self.output_dir / f"{timestamp}.csv"
+
+    #     with open(filepath, mode="w", newline="", encoding="utf-8") as f:
+    #         writer = csv.writer(f)
+    #         writer.writerow(["column1", "column2"])
+    #         writer.writerow([f"{timestamp}_1_1", f"{timestamp}_1_2"])
+    #         writer.writerow([f"{timestamp}_2_1", f"{timestamp}_2_2"])
+    #         writer.writerow([f"{timestamp}_3_1", f"{timestamp}_3_2"])
+
+    #     print(f"Created: {filepath}")
+    
     def _create_csv(self) -> None:
         timestamp: str = self.next_tick.strftime("%Y%m%d_%H%M%S")
         filepath: Path = self.output_dir / f"{timestamp}.csv"
 
         with open(filepath, mode="w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
+
+            # ヘッダー
             writer.writerow(["column1", "column2"])
-            writer.writerow([f"{timestamp}_1_1", f"{timestamp}_1_2"])
-            writer.writerow([f"{timestamp}_2_1", f"{timestamp}_2_2"])
-            writer.writerow([f"{timestamp}_3_1", f"{timestamp}_3_2"])
+
+            # データ行（1000行）
+            for i in range(1, 1001):
+                writer.writerow([
+                    f"{timestamp}_{i}_1",
+                    f"{timestamp}_{i}_2"
+                ])
 
         print(f"Created: {filepath}")
 

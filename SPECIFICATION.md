@@ -292,3 +292,14 @@ def _sleep_until_next_tick(self) -> None:
 4. **エクスポート機能**: マージ結果を別形式（JSON、Parquet等）で出力
 5. **エラーハンドリング**: 例外発生時の復旧機構
 6. **ログ記録**: 処理結果の詳細ログ保存
+
+
+## 補足(外部スクリプトの読み取り例)
+外部スクリプトの読み取り例（安全）
+from pathlib import Path
+import csv
+outdir = Path("./merged_csv")
+latest_name = (outdir / "latest.txt").read_text().strip()
+with open(outdir / latest_name, encoding="utf-8") as f:
+    rows = list(csv.reader(f))
+print(rows)

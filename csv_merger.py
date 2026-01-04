@@ -1,6 +1,5 @@
 import csv
 import time
-import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import NoReturn
@@ -11,21 +10,21 @@ class CsvMerger:
         self,
         input_dir: str | Path,
         output_dir: str | Path,
-        outdate_dir: str | Path,
         num_files: int = 20,
-        interval_sec: int = 1,
+        interval_sec: int = 5,
     ) -> None:
         self.input_dir: Path = Path(input_dir)
         self.output_dir: Path = Path(output_dir)
-        self.outdate_dir: Path = Path(outdate_dir)
         self.num_files: int = num_files
         self.interval_sec: int = interval_sec
 
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        self.outdate_dir.mkdir(parents=True, exist_ok=True)
 
         now: datetime = datetime.now()
         self.next_tick: datetime = now.replace(microsecond=0) + timedelta(seconds=1)
+
+        # ★ ポインタファイル
+        self.latest_path: Path = self.output_dir / "latest.txt"
 
     def _sleep_until_next_tick(self) -> None:
         sleep_time: float = (self.next_tick - datetime.now()).total_seconds()
@@ -40,21 +39,15 @@ class CsvMerger:
             print("No CSV files found.")
             return
 
-        timestamp: str = self.next_tick.strftime("%Y%m%d_%H%M%S")
+        # ★ ファイル名は「実時間」
+        now: datetime = datetime.now()
+        timestamp: str = now.strftime("%Y%m%d_%H%M%S")
 
-        history_path: Path = self.output_dir / f"merged_{timestamp}.csv"
+        merged_path: Path = self.output_dir / f"merged_{timestamp}.csv"
 
-        # outdate は一時ファイル経由
-        latest_path: Path = self.outdate_dir / "merged_outdate.csv"
-        tmp_path: Path = self.outdate_dir / "merged_outdate.tmp.csv"
-
-        with (
-            open(history_path, mode="w", newline="", encoding="utf-8") as fh,
-            open(tmp_path, mode="w", newline="", encoding="utf-8") as fl,
-        ):
-            writer_h = csv.writer(fh)
-            writer_l = csv.writer(fl)
-
+        # ① 完成物を書き出す
+        with open(merged_path, mode="w", newline="", encoding="utf-8") as fout:
+            writer = csv.writer(fout)
             header_written: bool = False
 
             for csv_file in target_files:
@@ -63,21 +56,16 @@ class CsvMerger:
                     header = next(reader)
 
                     if not header_written:
-                        writer_h.writerow(header)
-                        writer_l.writerow(header)
+                        writer.writerow(header)
                         header_written = True
 
                     for row in reader:
-                        writer_h.writerow(row)
-                        writer_l.writerow(row)
+                        writer.writerow(row)
 
-        # 原子的に差し替え（Windows / Linux 両対応）
-        os.replace(tmp_path, latest_path)
+        # ② 最後にポインタ更新（これが atomic 相当）
+        self.latest_path.write_text(merged_path.name, encoding="utf-8")
 
-        print(
-            f"Merged {len(target_files)} files -> "
-            f"{history_path}, {latest_path}"
-        )
+        print(f"Merged -> {merged_path} (latest updated)")
 
     def run(self) -> NoReturn:
         while True:
