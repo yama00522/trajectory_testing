@@ -1,0 +1,9 @@
+services:
+  pipeline:
+    build: .
+    container_name: trajectory-testing
+    volumes:
+      - ./output_csv:/app/output_csv
+      - ./merged_csv:/app/merged_csv
+      - ./merged_outdate:/app/merged_outdate
+    restart: unless-stopped

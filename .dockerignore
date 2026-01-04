@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv
+*.csv
+merged_csv/
+merged_outdate/
+output_csv/
+.git
+.gitignore
+.DS_Store
